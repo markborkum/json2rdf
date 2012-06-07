@@ -1,0 +1,207 @@
+/**
+ * GET search | Twitter Search API
+ * @version  1.0.0
+ * @author   Mark Borkum (m.i.borkum@soton.ac.uk)
+ * @see      https://dev.twitter.com/docs/api/1/get/search
+ * @example  Search for status updates that contain the hashtag "#linkeddata".  
+ *   http://search.twitter.com/search.json?q=%23linkeddata&include_entities=true
+ */
+
+PREFIX awol:       <http://bblfish.net/work/atom-owl/2006-06-06/#>
+PREFIX dcterms:    <http://purl.org/dc/terms/>
+PREFIX foaf:       <http://xmlns.com/foaf/0.1/>
+PREFIX geonames:   <http://www.geonames.org/ontology#>
+PREFIX nasdaq:     <http://www.daml.org/2002/08/nasdaq/nasdaq-ont#>
+PREFIX owl:        <http://www.w3.org/2002/07/owl#>
+PREFIX rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:       <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sioc:       <http://rdfs.org/sioc/ns#>
+PREFIX sioc_types: <http://rdfs.org/sioc/types#>
+PREFIX wgs84_pos:  <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX xsd:        <http://www.w3.org/2001/XMLSchema#>
+
+BIND twitter: <http://twitter.com/>
+
+FOREACH ${results} {
+	IF ${from_user} && ${id} {
+		<http://twitter.com/${from_user/downcase()}/statuses/${id}> AS ?status_update
+			a sioc_types:MicroblogPost ;
+			dcterms:created ${created_at/parseXSDDateTime("EEE, dd MMM yyyy HH:mm:ss Z")} ;
+			dcterms:hasFormat [
+				a awol:Content ;
+				awol:body ${asJSON()} ;
+				awol:type "application/json" 
+			] ;
+			dcterms:language ${iso_language_code}^^xsd:language ;
+			sioc:has_creator ?from_user ;
+			sioc:id ${id} .
+			
+		<http://twitter.com/${from_user/downcase()}> AS ?from_user_homepage
+			a foaf:Document ;
+			foaf:primaryTopic ?from_user .
+
+		<http://semantictweet.com/${from_user/downcase()}#me> AS ?from_user
+			a sioc:UserAccount ;
+			foaf:accountName ${from_user} ;
+			foaf:accountServiceHomepage ?twitter ;
+			foaf:homepage ?from_user_homepage ;
+			foaf:name ${from_user_name} ;
+			sioc:id ${from_user_id} .
+			
+		IF ${profile_image_url} {
+			?from_user
+				sioc:avatar ?from_user_avatar .
+				
+			<${profile_image_url}> AS ?from_user_avatar
+				a foaf:Image ;
+				= <${profile_image_url_https}> .
+		}
+		
+		IF ${entities} {
+			FOREACH ${entities} {
+				FOREACH ${hashtags} {
+					?status_update 
+						sioc:has_container ?hashtag .
+		
+					<http://search.twitter.com/search?q=%23${text}> AS ?hashtag
+						a sioc:Container ;
+						rdfs:label ${text} .
+				}
+				
+				FOREACH ${media} {
+					?status_update
+						sioc:links_to ?media_page ;
+						sioc:topic ?media .
+						
+					<${url}> AS ?media_page
+						a foaf:Document ;
+						= ?expanded_url ;
+						foaf:primaryTopic ?media ;
+						sioc:id ${id} .
+						
+					<${expanded_url}> AS ?expanded_url
+						rdfs:label ${display_url} .
+						
+					<${media_url}> AS ?media
+						a foaf:Image ;
+						= <${media_url_https}> .
+				}
+				
+				FOREACH ${urls} {
+					?status_update 
+						sioc:links_to ?url .
+						
+					<${url}> AS ?url
+						= ?expanded_url .
+						
+					<${expanded_url}> AS ?expanded_url
+						rdfs:label ${display_url} .
+				}
+				
+				FOREACH ${user_mentions} {
+					?status_update 
+						sioc:addressed_to ?to_user .
+						
+					<http://twitter.com/${screen_name/downcase()}> AS ?to_user_homepage
+						a foaf:Document ;
+						foaf:primaryTopic ?to_user .
+		
+					<http://semantictweet.com/${screen_name/downcase()}#me> AS ?to_user
+						a sioc:UserAccount ;
+						foaf:accountName ${screen_name} ;
+						foaf:accountServiceHomepage ?twitter ;
+						foaf:homepage ?to_user_homepage ;
+						foaf:name ${name} ;
+						sioc:id ${id} .
+				}
+			}
+		} ELSIF ${text} {
+			MATCH "#(\w+)" IN ${text} {
+				?status_update 
+						sioc:has_container ?hashtag .
+		
+				<http://search.twitter.com/search?q=%23${1}> AS ?hashtag
+					a sioc:Container ;
+					rdfs:label ${1} .
+			}
+			
+			MATCH "(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(\:[0-9]+)*(/[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]*)*" IN ${text} {
+				?status_update 
+					sioc:links_to <${0}> .
+			}
+		
+			MATCH "@(\w{1,20})" IN ${text} {
+				?status_update 
+					sioc:addressed_to ?to_user .
+					
+				<http://twitter.com/${1/downcase()}> AS ?to_user_homepage
+					a foaf:Document ;
+					foaf:primaryTopic ?to_user .
+	
+				<http://semantictweet.com/${1/downcase()}#me> AS ?to_user
+					a sioc:UserAccount ;
+					foaf:accountName ${1} ;
+					foaf:accountServiceHomepage ?twitter ;
+					foaf:homepage ?to_user_homepage .
+			}
+		}
+		
+		FOREACH ${geo} {
+			?status_update 
+				sioc:topic ?geo .
+		
+			<geo:${coordinates/0},${coordinates/1}> AS ?geo
+				a geonames:Feature ;
+				wgs84_pos:lat ${coordinates/0} ;
+				wgs84_pos:lat_long "${coordinates/0},${coordinates/1}" ;
+				wgs84_pos:long ${coordinates/1} .
+		}
+	
+		IF ${source} {
+			MATCH "&lt;a\s+href=&quot;(.*?)&quot;(?:\s+rel=&quot;nofollow&quot;)?&gt;(.*?)&lt;/a&gt;" IN ${source} {
+				?status_update
+					foaf:maker <${1}> .
+		
+				<${1}>
+					rdfs:label ${2} .
+			}
+		}
+		
+		IF ${text} {
+			?status_update
+				sioc:content [
+					a awol:Content ;
+					awol:body ${text}@${iso_language_code} ;
+					awol:lang ${iso_language_code}^^xsd:language ;
+					awol:length ${text/length()} ;
+					awol:type "text/plain"
+				] .
+			
+			MATCH "\$((?:[a-zA-Z]+)(?:[\.\-][a-zA-Z]+)*)" IN ${text} {
+				?status_update 
+					sioc:topic ?nasdaq_symbol .
+					
+				<http://www.nasdaq.com/symbol/${1/downcase()}> AS ?nasdaq_symbol
+					a nasdaq:Symbol ;
+					nasdaq:symbol ${1/upcase()} .
+			}
+		}
+		
+		IF ${to_user} {
+			?status_update 
+				sioc:addressed_to ?to_user .
+				
+			<http://twitter.com/${to_user/downcase()}> AS ?to_user_homepage
+				a foaf:Document ;
+				foaf:primaryTopic ?to_user .
+	
+			<http://semantictweet.com/${to_user/downcase()}#me> AS ?to_user
+				a sioc:UserAccount ;
+				foaf:accountName ${to_user} ;
+				foaf:accountServiceHomepage ?twitter ;
+				foaf:homepage ?to_user_homepage ;
+				foaf:name ${to_user_name} ;
+				sioc:id ${to_user_id} .
+		}
+	}
+}
