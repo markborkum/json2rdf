@@ -24,6 +24,7 @@ import uk.ac.soton.mib104.json2rdf.lang.Sendable;
 import uk.ac.soton.mib104.json2rdf.lang.method.AsJSONMethod;
 import uk.ac.soton.mib104.json2rdf.lang.method.ChildMethod;
 import uk.ac.soton.mib104.json2rdf.lang.method.CurrentTimeMethod;
+import uk.ac.soton.mib104.json2rdf.lang.method.IdentityMethod;
 import uk.ac.soton.mib104.json2rdf.lang.method.LengthMethod;
 import uk.ac.soton.mib104.json2rdf.lang.method.Method;
 import uk.ac.soton.mib104.json2rdf.lang.method.ParentMethod;
@@ -34,6 +35,7 @@ import uk.ac.soton.mib104.json2rdf.lang.method.ThisMethod;
 import uk.ac.soton.mib104.json2rdf.lang.method.ToLowerCaseMethod;
 import uk.ac.soton.mib104.json2rdf.lang.method.ToUpperCaseMethod;
 import uk.ac.soton.mib104.json2rdf.lang.method.TrimMethod;
+import uk.ac.soton.mib104.json2rdf.lang.method.VoidMethod;
 import uk.ac.soton.mib104.json2rdf.lang.template.MethodCallList;
 import uk.ac.soton.mib104.json2rdf.util.JSONUtils;
 import uk.ac.soton.mib104.json2rdf.util.MethodCallListFactory;
@@ -49,6 +51,9 @@ public class ObjectContext<T> implements EvaluationProvider<T> {
 	
 	static {
 		try {
+			addMethod(new IdentityMethod());
+			addMethod(new VoidMethod());
+			
 			addMethod(new ThisMethod());
 			addMethod(new ParentMethod());
 			addMethod(new RootMethod());
