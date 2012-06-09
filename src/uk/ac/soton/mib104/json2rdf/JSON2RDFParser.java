@@ -1,4 +1,4 @@
-// $ANTLR 3.4 /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g 2012-06-06 10:43:41
+// $ANTLR 3.4 /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g 2012-06-09 20:15:36
 
 	package uk.ac.soton.mib104.json2rdf;
 	
@@ -1924,20 +1924,21 @@ public class JSON2RDFParser extends Parser {
 
 
     // $ANTLR start "uriNodeTemplate"
-    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:307:1: uriNodeTemplate[Block parent] returns [Template<Node> template] : (uri= URI |namespacePrefix= PREFIX_NAME (localName= ID |localNameTemplate= interpolatedVariableOrString[] ) |nodeName= NODE_NAME );
+    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:307:1: uriNodeTemplate[Block parent] returns [Template<Node> template] : (uri= URI |namespacePrefix= PREFIX_NAME (localName= methodCallName[] |localNameTemplate= interpolatedVariableOrString[] ) |nodeName= NODE_NAME );
     public final Template<Node> uriNodeTemplate(Block parent) throws RecognitionException {
         Template<Node> template = null;
 
 
         Token uri=null;
         Token namespacePrefix=null;
-        Token localName=null;
         Token nodeName=null;
+        String localName =null;
+
         Template<?> localNameTemplate =null;
 
 
         try {
-            // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:308:2: (uri= URI |namespacePrefix= PREFIX_NAME (localName= ID |localNameTemplate= interpolatedVariableOrString[] ) |nodeName= NODE_NAME )
+            // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:308:2: (uri= URI |namespacePrefix= PREFIX_NAME (localName= methodCallName[] |localNameTemplate= interpolatedVariableOrString[] ) |nodeName= NODE_NAME )
             int alt22=3;
             switch ( input.LA(1) ) {
             case URI:
@@ -1976,15 +1977,15 @@ public class JSON2RDFParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:311:4: namespacePrefix= PREFIX_NAME (localName= ID |localNameTemplate= interpolatedVariableOrString[] )
+                    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:311:4: namespacePrefix= PREFIX_NAME (localName= methodCallName[] |localNameTemplate= interpolatedVariableOrString[] )
                     {
                     namespacePrefix=(Token)match(input,PREFIX_NAME,FOLLOW_PREFIX_NAME_in_uriNodeTemplate914); 
 
-                    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:311:32: (localName= ID |localNameTemplate= interpolatedVariableOrString[] )
+                    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:311:32: (localName= methodCallName[] |localNameTemplate= interpolatedVariableOrString[] )
                     int alt21=2;
                     int LA21_0 = input.LA(1);
 
-                    if ( (LA21_0==ID) ) {
+                    if ( (LA21_0==ID||(LA21_0 >= 46 && LA21_0 <= 49)) ) {
                         alt21=1;
                     }
                     else if ( (LA21_0==STRING||LA21_0==20) ) {
@@ -1999,12 +2000,16 @@ public class JSON2RDFParser extends Parser {
                     }
                     switch (alt21) {
                         case 1 :
-                            // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:311:34: localName= ID
+                            // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:311:34: localName= methodCallName[]
                             {
-                            localName=(Token)match(input,ID,FOLLOW_ID_in_uriNodeTemplate920); 
+                            pushFollow(FOLLOW_methodCallName_in_uriNodeTemplate920);
+                            localName=methodCallName();
+
+                            state._fsp--;
 
 
-                            			template = new PrefixedNameNodeTemplate(Template.toTemplate((namespacePrefix!=null?namespacePrefix.getText():null)), Template.toTemplate((localName!=null?localName.getText():null)));
+
+                            			template = new PrefixedNameNodeTemplate(Template.toTemplate((namespacePrefix!=null?namespacePrefix.getText():null)), Template.toTemplate(localName));
                             		
 
                             }
@@ -2012,7 +2017,7 @@ public class JSON2RDFParser extends Parser {
                         case 2 :
                             // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:313:7: localNameTemplate= interpolatedVariableOrString[]
                             {
-                            pushFollow(FOLLOW_interpolatedVariableOrString_in_uriNodeTemplate928);
+                            pushFollow(FOLLOW_interpolatedVariableOrString_in_uriNodeTemplate929);
                             localNameTemplate=interpolatedVariableOrString();
 
                             state._fsp--;
@@ -2033,7 +2038,7 @@ public class JSON2RDFParser extends Parser {
                 case 3 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:316:4: nodeName= NODE_NAME
                     {
-                    nodeName=(Token)match(input,NODE_NAME,FOLLOW_NODE_NAME_in_uriNodeTemplate940); 
+                    nodeName=(Token)match(input,NODE_NAME,FOLLOW_NODE_NAME_in_uriNodeTemplate941); 
 
 
                     			template = new NamedNodeTemplate(Template.toTemplate((nodeName!=null?nodeName.getText():null)));
@@ -2059,17 +2064,18 @@ public class JSON2RDFParser extends Parser {
 
 
     // $ANTLR start "anonNodeTemplate"
-    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:321:1: anonNodeTemplate[Block parent] returns [Template<Node> template] : ( '_:' anonId= ID | '[' ( predicateList[$parent, $template] )? ']' | '(' (nextTemplate= nodeTemplateWithName[$parent] )* ')' );
+    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:321:1: anonNodeTemplate[Block parent] returns [Template<Node> template] : ( '_:' anonId= methodCallName[] | '[' ( predicateList[$parent, $template] )? ']' | '(' (nextTemplate= nodeTemplateWithName[$parent] )* ')' );
     public final Template<Node> anonNodeTemplate(Block parent) throws RecognitionException {
         Template<Node> template = null;
 
 
-        Token anonId=null;
+        String anonId =null;
+
         Template<Node> nextTemplate =null;
 
 
         try {
-            // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:322:2: ( '_:' anonId= ID | '[' ( predicateList[$parent, $template] )? ']' | '(' (nextTemplate= nodeTemplateWithName[$parent] )* ')' )
+            // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:322:2: ( '_:' anonId= methodCallName[] | '[' ( predicateList[$parent, $template] )? ']' | '(' (nextTemplate= nodeTemplateWithName[$parent] )* ')' )
             int alt25=3;
             switch ( input.LA(1) ) {
             case 45:
@@ -2097,14 +2103,18 @@ public class JSON2RDFParser extends Parser {
 
             switch (alt25) {
                 case 1 :
-                    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:322:4: '_:' anonId= ID
+                    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:322:4: '_:' anonId= methodCallName[]
                     {
-                    match(input,45,FOLLOW_45_in_anonNodeTemplate959); 
+                    match(input,45,FOLLOW_45_in_anonNodeTemplate960); 
 
-                    anonId=(Token)match(input,ID,FOLLOW_ID_in_anonNodeTemplate963); 
+                    pushFollow(FOLLOW_methodCallName_in_anonNodeTemplate964);
+                    anonId=methodCallName();
+
+                    state._fsp--;
 
 
-                    			template = new AnonNodeTemplate(Template.toTemplate((anonId!=null?anonId.getText():null)));
+
+                    			template = new AnonNodeTemplate(Template.toTemplate(anonId));
                     		
 
                     }
@@ -2112,7 +2122,7 @@ public class JSON2RDFParser extends Parser {
                 case 2 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:325:4: '[' ( predicateList[$parent, $template] )? ']'
                     {
-                    match(input,41,FOLLOW_41_in_anonNodeTemplate970); 
+                    match(input,41,FOLLOW_41_in_anonNodeTemplate972); 
 
 
                     			template = new AnonNodeTemplate();
@@ -2129,7 +2139,7 @@ public class JSON2RDFParser extends Parser {
                         case 1 :
                             // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:327:7: predicateList[$parent, $template]
                             {
-                            pushFollow(FOLLOW_predicateList_in_anonNodeTemplate976);
+                            pushFollow(FOLLOW_predicateList_in_anonNodeTemplate978);
                             predicateList(parent, template);
 
                             state._fsp--;
@@ -2141,14 +2151,14 @@ public class JSON2RDFParser extends Parser {
                     }
 
 
-                    match(input,43,FOLLOW_43_in_anonNodeTemplate982); 
+                    match(input,43,FOLLOW_43_in_anonNodeTemplate984); 
 
                     }
                     break;
                 case 3 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:328:4: '(' (nextTemplate= nodeTemplateWithName[$parent] )* ')'
                     {
-                    match(input,22,FOLLOW_22_in_anonNodeTemplate987); 
+                    match(input,22,FOLLOW_22_in_anonNodeTemplate989); 
 
 
                     			final List<Template<Node>> templates = new LinkedList<Template<Node>>();
@@ -2169,7 +2179,7 @@ public class JSON2RDFParser extends Parser {
                     	case 1 :
                     	    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:330:7: nextTemplate= nodeTemplateWithName[$parent]
                     	    {
-                    	    pushFollow(FOLLOW_nodeTemplateWithName_in_anonNodeTemplate995);
+                    	    pushFollow(FOLLOW_nodeTemplateWithName_in_anonNodeTemplate997);
                     	    nextTemplate=nodeTemplateWithName(parent);
 
                     	    state._fsp--;
@@ -2188,7 +2198,7 @@ public class JSON2RDFParser extends Parser {
                     } while (true);
 
 
-                    match(input,23,FOLLOW_23_in_anonNodeTemplate1003); 
+                    match(input,23,FOLLOW_23_in_anonNodeTemplate1005); 
 
 
                     			if (templates.isEmpty()) {
@@ -2272,7 +2282,7 @@ public class JSON2RDFParser extends Parser {
                     			Template<Node> datatypeTemplate = null;
                     		
 
-                    pushFollow(FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1026);
+                    pushFollow(FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1028);
                     value=interpolatedVariableOrString();
 
                     state._fsp--;
@@ -2317,7 +2327,7 @@ public class JSON2RDFParser extends Parser {
                                 case 1 :
                                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:371:9: languageAsString= LANG_TAG
                                     {
-                                    languageAsString=(Token)match(input,LANG_TAG,FOLLOW_LANG_TAG_in_literalNodeTemplate1037); 
+                                    languageAsString=(Token)match(input,LANG_TAG,FOLLOW_LANG_TAG_in_literalNodeTemplate1039); 
 
 
                                     			languageTemplate = Template.toTemplate((languageAsString!=null?languageAsString.getText():null));
@@ -2328,9 +2338,9 @@ public class JSON2RDFParser extends Parser {
                                 case 2 :
                                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:373:7: '@' languageAsTemplate= interpolatedVariableOrString[]
                                     {
-                                    match(input,30,FOLLOW_30_in_literalNodeTemplate1043); 
+                                    match(input,30,FOLLOW_30_in_literalNodeTemplate1045); 
 
-                                    pushFollow(FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1047);
+                                    pushFollow(FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1049);
                                     languageAsTemplate=interpolatedVariableOrString();
 
                                     state._fsp--;
@@ -2351,9 +2361,9 @@ public class JSON2RDFParser extends Parser {
                         case 2 :
                             // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:375:9: '^^' datatype= resourceNodeTemplate[$parent]
                             {
-                            match(input,44,FOLLOW_44_in_literalNodeTemplate1056); 
+                            match(input,44,FOLLOW_44_in_literalNodeTemplate1058); 
 
-                            pushFollow(FOLLOW_resourceNodeTemplate_in_literalNodeTemplate1060);
+                            pushFollow(FOLLOW_resourceNodeTemplate_in_literalNodeTemplate1062);
                             datatype=resourceNodeTemplate(parent);
 
                             state._fsp--;
@@ -2384,13 +2394,13 @@ public class JSON2RDFParser extends Parser {
                 case 2 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:386:4: sign= positiveOrNegative[] INT
                     {
-                    pushFollow(FOLLOW_positiveOrNegative_in_literalNodeTemplate1075);
+                    pushFollow(FOLLOW_positiveOrNegative_in_literalNodeTemplate1077);
                     sign=positiveOrNegative();
 
                     state._fsp--;
 
 
-                    INT1=(Token)match(input,INT,FOLLOW_INT_in_literalNodeTemplate1078); 
+                    INT1=(Token)match(input,INT,FOLLOW_INT_in_literalNodeTemplate1080); 
 
 
                     			try {
@@ -2405,13 +2415,13 @@ public class JSON2RDFParser extends Parser {
                 case 3 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:393:4: sign= positiveOrNegative[] FLOAT
                     {
-                    pushFollow(FOLLOW_positiveOrNegative_in_literalNodeTemplate1087);
+                    pushFollow(FOLLOW_positiveOrNegative_in_literalNodeTemplate1089);
                     sign=positiveOrNegative();
 
                     state._fsp--;
 
 
-                    FLOAT2=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_literalNodeTemplate1090); 
+                    FLOAT2=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_literalNodeTemplate1092); 
 
 
                     			try {
@@ -2426,7 +2436,7 @@ public class JSON2RDFParser extends Parser {
                 case 4 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:400:4: 'false'
                     {
-                    match(input,47,FOLLOW_47_in_literalNodeTemplate1097); 
+                    match(input,47,FOLLOW_47_in_literalNodeTemplate1099); 
 
 
                     			template = new TypedLiteralNodeTemplate(Template.toTemplate(Boolean.FALSE));
@@ -2437,7 +2447,7 @@ public class JSON2RDFParser extends Parser {
                 case 5 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:403:4: 'true'
                     {
-                    match(input,49,FOLLOW_49_in_literalNodeTemplate1104); 
+                    match(input,49,FOLLOW_49_in_literalNodeTemplate1106); 
 
 
                     			template = new TypedLiteralNodeTemplate(Template.toTemplate(Boolean.TRUE));
@@ -2448,7 +2458,7 @@ public class JSON2RDFParser extends Parser {
                 case 6 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:406:4: 'now'
                     {
-                    match(input,48,FOLLOW_48_in_literalNodeTemplate1111); 
+                    match(input,48,FOLLOW_48_in_literalNodeTemplate1113); 
 
 
                     			template = new CurrentTimeNodeTemplate();
@@ -2505,7 +2515,7 @@ public class JSON2RDFParser extends Parser {
                 case 1 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:412:4: variable= interpolatedVariable[]
                     {
-                    pushFollow(FOLLOW_interpolatedVariable_in_interpolatedVariableOrString1132);
+                    pushFollow(FOLLOW_interpolatedVariable_in_interpolatedVariableOrString1134);
                     variable=interpolatedVariable();
 
                     state._fsp--;
@@ -2520,7 +2530,7 @@ public class JSON2RDFParser extends Parser {
                 case 2 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:415:4: STRING
                     {
-                    STRING3=(Token)match(input,STRING,FOLLOW_STRING_in_interpolatedVariableOrString1140); 
+                    STRING3=(Token)match(input,STRING,FOLLOW_STRING_in_interpolatedVariableOrString1142); 
 
                      
                     			template = new InterpolatedStringTemplate(Template.toTemplate((STRING3!=null?STRING3.getText():null))); 
@@ -2563,7 +2573,7 @@ public class JSON2RDFParser extends Parser {
             // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:424:2: ( '${' (head= methodCall[] ( '/' tail= methodCall[] )* )? '}' )
             // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:424:4: '${' (head= methodCall[] ( '/' tail= methodCall[] )* )? '}'
             {
-            match(input,20,FOLLOW_20_in_interpolatedVariable1164); 
+            match(input,20,FOLLOW_20_in_interpolatedVariable1166); 
 
             // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:424:9: (head= methodCall[] ( '/' tail= methodCall[] )* )?
             int alt31=2;
@@ -2576,7 +2586,7 @@ public class JSON2RDFParser extends Parser {
                 case 1 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:424:11: head= methodCall[] ( '/' tail= methodCall[] )*
                     {
-                    pushFollow(FOLLOW_methodCall_in_interpolatedVariable1170);
+                    pushFollow(FOLLOW_methodCall_in_interpolatedVariable1172);
                     head=methodCall();
 
                     state._fsp--;
@@ -2601,9 +2611,9 @@ public class JSON2RDFParser extends Parser {
                     	case 1 :
                     	    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:426:7: '/' tail= methodCall[]
                     	    {
-                    	    match(input,27,FOLLOW_27_in_interpolatedVariable1177); 
+                    	    match(input,27,FOLLOW_27_in_interpolatedVariable1179); 
 
-                    	    pushFollow(FOLLOW_methodCall_in_interpolatedVariable1181);
+                    	    pushFollow(FOLLOW_methodCall_in_interpolatedVariable1183);
                     	    tail=methodCall();
 
                     	    state._fsp--;
@@ -2628,7 +2638,7 @@ public class JSON2RDFParser extends Parser {
             }
 
 
-            match(input,52,FOLLOW_52_in_interpolatedVariable1192); 
+            match(input,52,FOLLOW_52_in_interpolatedVariable1194); 
 
             }
 
@@ -2702,7 +2712,7 @@ public class JSON2RDFParser extends Parser {
                 case 1 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:432:4: methodName= methodCallName[] ( '(' (head= methodCallArgument[] ( ',' tail= methodCallArgument[] )* )? ')' )?
                     {
-                    pushFollow(FOLLOW_methodCallName_in_methodCall1211);
+                    pushFollow(FOLLOW_methodCallName_in_methodCall1213);
                     methodName=methodCallName();
 
                     state._fsp--;
@@ -2723,7 +2733,7 @@ public class JSON2RDFParser extends Parser {
                         case 1 :
                             // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:434:7: '(' (head= methodCallArgument[] ( ',' tail= methodCallArgument[] )* )? ')'
                             {
-                            match(input,22,FOLLOW_22_in_methodCall1218); 
+                            match(input,22,FOLLOW_22_in_methodCall1220); 
 
 
                             			final List<Object> arguments = new LinkedList<Object>();
@@ -2740,7 +2750,7 @@ public class JSON2RDFParser extends Parser {
                                 case 1 :
                                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:436:7: head= methodCallArgument[] ( ',' tail= methodCallArgument[] )*
                                     {
-                                    pushFollow(FOLLOW_methodCallArgument_in_methodCall1226);
+                                    pushFollow(FOLLOW_methodCallArgument_in_methodCall1228);
                                     head=methodCallArgument();
 
                                     state._fsp--;
@@ -2765,9 +2775,9 @@ public class JSON2RDFParser extends Parser {
                                     	case 1 :
                                     	    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:438:7: ',' tail= methodCallArgument[]
                                     	    {
-                                    	    match(input,25,FOLLOW_25_in_methodCall1233); 
+                                    	    match(input,25,FOLLOW_25_in_methodCall1235); 
 
-                                    	    pushFollow(FOLLOW_methodCallArgument_in_methodCall1237);
+                                    	    pushFollow(FOLLOW_methodCallArgument_in_methodCall1239);
                                     	    tail=methodCallArgument();
 
                                     	    state._fsp--;
@@ -2792,7 +2802,7 @@ public class JSON2RDFParser extends Parser {
                             }
 
 
-                            match(input,23,FOLLOW_23_in_methodCall1248); 
+                            match(input,23,FOLLOW_23_in_methodCall1250); 
 
 
                             			template = new MethodCall(methodName, arguments.toArray(new Object[arguments.size()]));
@@ -2809,7 +2819,7 @@ public class JSON2RDFParser extends Parser {
                 case 2 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:443:4: STRING
                     {
-                    STRING4=(Token)match(input,STRING,FOLLOW_STRING_in_methodCall1258); 
+                    STRING4=(Token)match(input,STRING,FOLLOW_STRING_in_methodCall1260); 
 
                      
                     			template = new MethodCall(ChildMethod.getMethodName(), new Object[] { (STRING4!=null?STRING4.getText():null) }); 
@@ -2820,13 +2830,13 @@ public class JSON2RDFParser extends Parser {
                 case 3 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:446:4: sign= positiveOrNegative[] INT
                     {
-                    pushFollow(FOLLOW_positiveOrNegative_in_methodCall1267);
+                    pushFollow(FOLLOW_positiveOrNegative_in_methodCall1269);
                     sign=positiveOrNegative();
 
                     state._fsp--;
 
 
-                    INT5=(Token)match(input,INT,FOLLOW_INT_in_methodCall1270); 
+                    INT5=(Token)match(input,INT,FOLLOW_INT_in_methodCall1272); 
 
                      
                     			try {
@@ -2904,7 +2914,7 @@ public class JSON2RDFParser extends Parser {
                 case 1 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:456:4: ID
                     {
-                    ID6=(Token)match(input,ID,FOLLOW_ID_in_methodCallName1289); 
+                    ID6=(Token)match(input,ID,FOLLOW_ID_in_methodCallName1291); 
 
 
                     			string = (ID6!=null?ID6.getText():null);
@@ -2915,7 +2925,7 @@ public class JSON2RDFParser extends Parser {
                 case 2 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:459:4: 'a'
                     {
-                    match(input,46,FOLLOW_46_in_methodCallName1296); 
+                    match(input,46,FOLLOW_46_in_methodCallName1298); 
 
 
                     			string = "a";
@@ -2926,7 +2936,7 @@ public class JSON2RDFParser extends Parser {
                 case 3 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:462:4: 'false'
                     {
-                    match(input,47,FOLLOW_47_in_methodCallName1303); 
+                    match(input,47,FOLLOW_47_in_methodCallName1305); 
 
 
                     			string = "false";
@@ -2937,7 +2947,7 @@ public class JSON2RDFParser extends Parser {
                 case 4 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:465:4: 'true'
                     {
-                    match(input,49,FOLLOW_49_in_methodCallName1310); 
+                    match(input,49,FOLLOW_49_in_methodCallName1312); 
 
 
                     			string = "true";
@@ -2948,7 +2958,7 @@ public class JSON2RDFParser extends Parser {
                 case 5 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:468:4: 'now'
                     {
-                    match(input,48,FOLLOW_48_in_methodCallName1317); 
+                    match(input,48,FOLLOW_48_in_methodCallName1319); 
 
 
                     			string = "now";
@@ -2993,7 +3003,7 @@ public class JSON2RDFParser extends Parser {
                 case 1 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:474:4: STRING
                     {
-                    STRING7=(Token)match(input,STRING,FOLLOW_STRING_in_methodCallArgument1336); 
+                    STRING7=(Token)match(input,STRING,FOLLOW_STRING_in_methodCallArgument1338); 
 
                      
                     			argument = (STRING7!=null?STRING7.getText():null); 
@@ -3004,13 +3014,13 @@ public class JSON2RDFParser extends Parser {
                 case 2 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:477:4: sign= positiveOrNegative[] INT
                     {
-                    pushFollow(FOLLOW_positiveOrNegative_in_methodCallArgument1345);
+                    pushFollow(FOLLOW_positiveOrNegative_in_methodCallArgument1347);
                     sign=positiveOrNegative();
 
                     state._fsp--;
 
 
-                    INT8=(Token)match(input,INT,FOLLOW_INT_in_methodCallArgument1348); 
+                    INT8=(Token)match(input,INT,FOLLOW_INT_in_methodCallArgument1350); 
 
                      
                     			try {
@@ -3025,13 +3035,13 @@ public class JSON2RDFParser extends Parser {
                 case 3 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:484:4: sign= positiveOrNegative[] FLOAT
                     {
-                    pushFollow(FOLLOW_positiveOrNegative_in_methodCallArgument1357);
+                    pushFollow(FOLLOW_positiveOrNegative_in_methodCallArgument1359);
                     sign=positiveOrNegative();
 
                     state._fsp--;
 
 
-                    FLOAT9=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_methodCallArgument1360); 
+                    FLOAT9=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_methodCallArgument1362); 
 
 
                     			try {
@@ -3046,7 +3056,7 @@ public class JSON2RDFParser extends Parser {
                 case 4 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:491:4: 'false'
                     {
-                    match(input,47,FOLLOW_47_in_methodCallArgument1367); 
+                    match(input,47,FOLLOW_47_in_methodCallArgument1369); 
 
                      
                     			argument = Boolean.FALSE; 
@@ -3057,7 +3067,7 @@ public class JSON2RDFParser extends Parser {
                 case 5 :
                     // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:494:4: 'true'
                     {
-                    match(input,49,FOLLOW_49_in_methodCallArgument1374); 
+                    match(input,49,FOLLOW_49_in_methodCallArgument1376); 
 
                      
                     			argument = Boolean.TRUE; 
@@ -3113,7 +3123,7 @@ public class JSON2RDFParser extends Parser {
             	case 1 :
             	    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:506:6: '+'
             	    {
-            	    match(input,24,FOLLOW_24_in_positiveOrNegative1404); 
+            	    match(input,24,FOLLOW_24_in_positiveOrNegative1406); 
 
             	     sb.append(POSITIVE_TERMINAL); 
 
@@ -3122,7 +3132,7 @@ public class JSON2RDFParser extends Parser {
             	case 2 :
             	    // /Users/mib/Documents/workspace/JSON2RDF v5/src/antlr3/JSON2RDF.g:506:46: '-'
             	    {
-            	    match(input,26,FOLLOW_26_in_positiveOrNegative1410); 
+            	    match(input,26,FOLLOW_26_in_positiveOrNegative1412); 
 
             	     sb.append(NEGATIVE_TERMINAL); 
 
@@ -3358,60 +3368,60 @@ public class JSON2RDFParser extends Parser {
     public static final BitSet FOLLOW_31_in_uriNodeTemplateWithName877 = new BitSet(new long[]{0x0000000000001000L});
     public static final BitSet FOLLOW_NODE_NAME_in_uriNodeTemplateWithName881 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_URI_in_uriNodeTemplate905 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PREFIX_NAME_in_uriNodeTemplate914 = new BitSet(new long[]{0x0000000000108200L});
-    public static final BitSet FOLLOW_ID_in_uriNodeTemplate920 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_interpolatedVariableOrString_in_uriNodeTemplate928 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NODE_NAME_in_uriNodeTemplate940 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_45_in_anonNodeTemplate959 = new BitSet(new long[]{0x0000000000000200L});
-    public static final BitSet FOLLOW_ID_in_anonNodeTemplate963 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_41_in_anonNodeTemplate970 = new BitSet(new long[]{0x0000480020025000L});
-    public static final BitSet FOLLOW_predicateList_in_anonNodeTemplate976 = new BitSet(new long[]{0x0000080000000000L});
-    public static final BitSet FOLLOW_43_in_anonNodeTemplate982 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_22_in_anonNodeTemplate987 = new BitSet(new long[]{0x0003A20005D2D480L});
-    public static final BitSet FOLLOW_nodeTemplateWithName_in_anonNodeTemplate995 = new BitSet(new long[]{0x0003A20005D2D480L});
-    public static final BitSet FOLLOW_23_in_anonNodeTemplate1003 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1026 = new BitSet(new long[]{0x0000100040000802L});
-    public static final BitSet FOLLOW_LANG_TAG_in_literalNodeTemplate1037 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_30_in_literalNodeTemplate1043 = new BitSet(new long[]{0x0000000000108000L});
-    public static final BitSet FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1047 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_44_in_literalNodeTemplate1056 = new BitSet(new long[]{0x0000220000425000L});
-    public static final BitSet FOLLOW_resourceNodeTemplate_in_literalNodeTemplate1060 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_positiveOrNegative_in_literalNodeTemplate1075 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_INT_in_literalNodeTemplate1078 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_positiveOrNegative_in_literalNodeTemplate1087 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_FLOAT_in_literalNodeTemplate1090 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_47_in_literalNodeTemplate1097 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_literalNodeTemplate1104 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_48_in_literalNodeTemplate1111 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_interpolatedVariable_in_interpolatedVariableOrString1132 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_interpolatedVariableOrString1140 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_20_in_interpolatedVariable1164 = new BitSet(new long[]{0x0013C00005008600L});
-    public static final BitSet FOLLOW_methodCall_in_interpolatedVariable1170 = new BitSet(new long[]{0x0010000008000000L});
-    public static final BitSet FOLLOW_27_in_interpolatedVariable1177 = new BitSet(new long[]{0x0003C00005008600L});
-    public static final BitSet FOLLOW_methodCall_in_interpolatedVariable1181 = new BitSet(new long[]{0x0010000008000000L});
-    public static final BitSet FOLLOW_52_in_interpolatedVariable1192 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_methodCallName_in_methodCall1211 = new BitSet(new long[]{0x0000000000400002L});
-    public static final BitSet FOLLOW_22_in_methodCall1218 = new BitSet(new long[]{0x0002800005808480L});
-    public static final BitSet FOLLOW_methodCallArgument_in_methodCall1226 = new BitSet(new long[]{0x0000000002800000L});
-    public static final BitSet FOLLOW_25_in_methodCall1233 = new BitSet(new long[]{0x0002800005008480L});
-    public static final BitSet FOLLOW_methodCallArgument_in_methodCall1237 = new BitSet(new long[]{0x0000000002800000L});
-    public static final BitSet FOLLOW_23_in_methodCall1248 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_methodCall1258 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_positiveOrNegative_in_methodCall1267 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_INT_in_methodCall1270 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ID_in_methodCallName1289 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_46_in_methodCallName1296 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_47_in_methodCallName1303 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_methodCallName1310 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_48_in_methodCallName1317 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_methodCallArgument1336 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_positiveOrNegative_in_methodCallArgument1345 = new BitSet(new long[]{0x0000000000000400L});
-    public static final BitSet FOLLOW_INT_in_methodCallArgument1348 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_positiveOrNegative_in_methodCallArgument1357 = new BitSet(new long[]{0x0000000000000080L});
-    public static final BitSet FOLLOW_FLOAT_in_methodCallArgument1360 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_47_in_methodCallArgument1367 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_49_in_methodCallArgument1374 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_24_in_positiveOrNegative1404 = new BitSet(new long[]{0x0000000005000002L});
-    public static final BitSet FOLLOW_26_in_positiveOrNegative1410 = new BitSet(new long[]{0x0000000005000002L});
+    public static final BitSet FOLLOW_PREFIX_NAME_in_uriNodeTemplate914 = new BitSet(new long[]{0x0003C00000108200L});
+    public static final BitSet FOLLOW_methodCallName_in_uriNodeTemplate920 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_interpolatedVariableOrString_in_uriNodeTemplate929 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NODE_NAME_in_uriNodeTemplate941 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_45_in_anonNodeTemplate960 = new BitSet(new long[]{0x0003C00000000200L});
+    public static final BitSet FOLLOW_methodCallName_in_anonNodeTemplate964 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_41_in_anonNodeTemplate972 = new BitSet(new long[]{0x0000480020025000L});
+    public static final BitSet FOLLOW_predicateList_in_anonNodeTemplate978 = new BitSet(new long[]{0x0000080000000000L});
+    public static final BitSet FOLLOW_43_in_anonNodeTemplate984 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_22_in_anonNodeTemplate989 = new BitSet(new long[]{0x0003A20005D2D480L});
+    public static final BitSet FOLLOW_nodeTemplateWithName_in_anonNodeTemplate997 = new BitSet(new long[]{0x0003A20005D2D480L});
+    public static final BitSet FOLLOW_23_in_anonNodeTemplate1005 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1028 = new BitSet(new long[]{0x0000100040000802L});
+    public static final BitSet FOLLOW_LANG_TAG_in_literalNodeTemplate1039 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_30_in_literalNodeTemplate1045 = new BitSet(new long[]{0x0000000000108000L});
+    public static final BitSet FOLLOW_interpolatedVariableOrString_in_literalNodeTemplate1049 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_44_in_literalNodeTemplate1058 = new BitSet(new long[]{0x0000220000425000L});
+    public static final BitSet FOLLOW_resourceNodeTemplate_in_literalNodeTemplate1062 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_positiveOrNegative_in_literalNodeTemplate1077 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_INT_in_literalNodeTemplate1080 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_positiveOrNegative_in_literalNodeTemplate1089 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_FLOAT_in_literalNodeTemplate1092 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_47_in_literalNodeTemplate1099 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_literalNodeTemplate1106 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_48_in_literalNodeTemplate1113 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_interpolatedVariable_in_interpolatedVariableOrString1134 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_interpolatedVariableOrString1142 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_20_in_interpolatedVariable1166 = new BitSet(new long[]{0x0013C00005008600L});
+    public static final BitSet FOLLOW_methodCall_in_interpolatedVariable1172 = new BitSet(new long[]{0x0010000008000000L});
+    public static final BitSet FOLLOW_27_in_interpolatedVariable1179 = new BitSet(new long[]{0x0003C00005008600L});
+    public static final BitSet FOLLOW_methodCall_in_interpolatedVariable1183 = new BitSet(new long[]{0x0010000008000000L});
+    public static final BitSet FOLLOW_52_in_interpolatedVariable1194 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_methodCallName_in_methodCall1213 = new BitSet(new long[]{0x0000000000400002L});
+    public static final BitSet FOLLOW_22_in_methodCall1220 = new BitSet(new long[]{0x0002800005808480L});
+    public static final BitSet FOLLOW_methodCallArgument_in_methodCall1228 = new BitSet(new long[]{0x0000000002800000L});
+    public static final BitSet FOLLOW_25_in_methodCall1235 = new BitSet(new long[]{0x0002800005008480L});
+    public static final BitSet FOLLOW_methodCallArgument_in_methodCall1239 = new BitSet(new long[]{0x0000000002800000L});
+    public static final BitSet FOLLOW_23_in_methodCall1250 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_methodCall1260 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_positiveOrNegative_in_methodCall1269 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_INT_in_methodCall1272 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ID_in_methodCallName1291 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_46_in_methodCallName1298 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_47_in_methodCallName1305 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_methodCallName1312 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_48_in_methodCallName1319 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_methodCallArgument1338 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_positiveOrNegative_in_methodCallArgument1347 = new BitSet(new long[]{0x0000000000000400L});
+    public static final BitSet FOLLOW_INT_in_methodCallArgument1350 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_positiveOrNegative_in_methodCallArgument1359 = new BitSet(new long[]{0x0000000000000080L});
+    public static final BitSet FOLLOW_FLOAT_in_methodCallArgument1362 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_47_in_methodCallArgument1369 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_49_in_methodCallArgument1376 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_24_in_positiveOrNegative1406 = new BitSet(new long[]{0x0000000005000002L});
+    public static final BitSet FOLLOW_26_in_positiveOrNegative1412 = new BitSet(new long[]{0x0000000005000002L});
 
 }
